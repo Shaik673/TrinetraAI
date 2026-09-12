@@ -1,0 +1,295 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #020812;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #060e1e;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1a3a6e;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00d4ff;
+  }
+
+  ::selection {
+    background: rgba(0, 212, 255, 0.3);
+    color: #fff;
+  }
+}
+
+@layer components {
+  /* Glass card effect */
+  .glass {
+    background: rgba(10, 22, 40, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+  }
+
+  .glass-strong {
+    background: rgba(6, 14, 30, 0.8);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+  }
+
+  .glass-hover {
+    transition: all 0.3s ease;
+  }
+
+  .glass-hover:hover {
+    background: rgba(10, 22, 40, 0.8);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+  }
+
+  /* Neon text effects */
+  .neon-text-blue {
+    color: #00d4ff;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  }
+
+  .neon-text-cyan {
+    color: #00ffcc;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+  }
+
+  .neon-text-purple {
+    color: #a855f7;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+
+  /* Neon borders */
+  .neon-border {
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.1), inset 0 0 10px rgba(0, 212, 255, 0.05);
+  }
+
+  .neon-border-purple {
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.1);
+  }
+
+  /* Severity badges */
+  .severity-critical {
+    background: rgba(255, 51, 102, 0.15);
+    color: #ff3366;
+    border: 1px solid rgba(255, 51, 102, 0.3);
+  }
+
+  .severity-high {
+    background: rgba(255, 107, 53, 0.15);
+    color: #ff6b35;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+  }
+
+  .severity-medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .severity-low {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .severity-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  /* Status badges */
+  .status-active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+  }
+
+  .status-complete {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+  }
+
+  .status-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .status-failed {
+    background: rgba(255, 51, 102, 0.15);
+    color: #ff3366;
+    border: 1px solid rgba(255, 51, 102, 0.3);
+  }
+
+  /* Cyber grid background */
+  .cyber-grid-bg {
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Animated scan line */
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.6), transparent);
+    animation: scan 3s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Agent status indicators */
+  .agent-running {
+    animation: threatPulse 1.5s ease-in-out infinite;
+    color: #00d4ff;
+  }
+
+  .agent-completed {
+    color: #00ff88;
+  }
+
+  .agent-idle {
+    color: #475569;
+  }
+
+  /* Data flow animation */
+  .data-flow-line {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .data-flow-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.4), transparent);
+    animation: dataFlow 2s linear infinite;
+  }
+
+  /* Threat pulse for critical alerts */
+  .threat-critical-pulse {
+    animation: threatPulse 1s ease-in-out infinite;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #00d4ff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-cyan {
+    background: linear-gradient(135deg, #00ffcc, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    color: #00d4ff;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(168, 85, 247, 0.3));
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-danger {
+    background: rgba(255, 51, 102, 0.15);
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: #ff3366;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background: rgba(255, 51, 102, 0.25);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);
+  }
+
+  /* Input fields */
+  .cyber-input {
+    background: rgba(6, 14, 30, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .cyber-input:focus {
+    outline: none;
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+  }
+
+  .cyber-input::placeholder {
+    color: rgba(148, 163, 184, 0.5);
+  }
+}
+
+/* Custom animations for page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Recharts customization */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(0, 212, 255, 0.05) !important;
+}
+
+.recharts-text {
+  fill: rgba(148, 163, 184, 0.7) !important;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(6, 14, 30, 0.95) !important;
+  border: 1px solid rgba(0, 212, 255, 0.2) !important;
+  border-radius: 8px !important;
+}
