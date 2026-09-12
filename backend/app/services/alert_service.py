@@ -62,9 +62,15 @@ class AlertService:
     ) -> List[Alert]:
         query = select(Alert).order_by(Alert.created_at.desc())
         if severity:
-            query = query.where(Alert.severity == AlertSeverity(severity))
+            try:
+                query = query.where(Alert.severity == AlertSeverity(severity.lower()))
+            except ValueError:
+                return []
         if status:
-            query = query.where(Alert.status == AlertStatus(status))
+            try:
+                query = query.where(Alert.status == AlertStatus(status.lower()))
+            except ValueError:
+                return []
         result = await db.execute(query.offset(skip).limit(limit))
         return result.scalars().all()
 

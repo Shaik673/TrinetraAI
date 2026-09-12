@@ -1,1 +1,36 @@
-import PlaceholderPage from '../PlaceholderPage'; export default () => <PlaceholderPage title="Investigation detail" />
+import { useQueries, useQuery } from '@tanstack/react-query'
+import { Link, useParams } from 'react-router-dom'
+import { ArrowLeft, Brain, CheckCircle, FileSearch, ShieldAlert, Zap } from 'lucide-react'
+import { api } from '../../api/client'
+import { AgentTimeline, AgentWorkflowDiagram } from '../../components/ui/AgentTimeline'
+import { GlassCard, LoadingSpinner, PageHeader, StatusBadge } from '../../components/ui/GlassCard'
+import { formatDate, outcomeColor } from '../../utils/helpers'
+
+export default function InvestigationDetailPage() {
+  const { id } = useParams()
+  const investigation = useQuery({ queryKey: ['investigation', id], queryFn: () => api.getInvestigation(id).then((response) => response.data), refetchInterval: 10_000 })
+  const details = useQueries({ queries: [
+    { queryKey: ['investigation', id, 'evidence'], queryFn: () => api.getInvestigationEvidence(id).then((response) => response.data), enabled: Boolean(id) },
+    { queryKey: ['investigation', id, 'assessments'], queryFn: () => api.getInvestigationAssessments(id).then((response) => response.data), enabled: Boolean(id) },
+    { queryKey: ['investigation', id, 'responses'], queryFn: () => api.getInvestigationResponses(id).then((response) => response.data), enabled: Boolean(id) },
+    { queryKey: ['investigation', id, 'verifications'], queryFn: () => api.getInvestigationVerifications(id).then((response) => response.data), enabled: Boolean(id) },
+    { queryKey: ['investigation', id, 'agents'], queryFn: () => api.getInvestigationAgents(id).then((response) => response.data), enabled: Boolean(id) },
+  ] })
+  if (investigation.isLoading) return <div className="h-full flex justify-center items-center"><LoadingSpinner size="lg" /></div>
+  if (investigation.isError) return <div><PageHeader title="Investigation not found" icon={FileSearch} /><Link to="/investigations" className="inline-flex text-sm text-neon-blue items-center gap-2"><ArrowLeft className="w-4 h-4" />Back to investigations</Link></div>
+  const item = investigation.data
+  const [evidence, assessments, responses, verifications, agents] = details.map((query) => query.data || [])
+  const decisions = (item.agent_decisions || []).length ? item.agent_decisions : agents.map((agent) => ({ agent: agent.agent_name, cycle: agent.cycle, decision: agent.decision, reasoning: agent.reasoning }))
+  const completedAgents = agents.filter((agent) => agent.status === 'completed').map((agent) => agent.agent_name)
+  const currentAgent = item.workflow_state?.current_agent || (item.status === 'completed' ? null : item.workflow_state?.agents_executed?.at(-1))
+  return <div><PageHeader title={item.investigation_id} subtitle={`Started ${formatDate(item.started_at || item.created_at)}`} icon={FileSearch} actions={<StatusBadge status={item.status} />} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5"><Metric label="Attack outcome" value={item.attack_outcome || 'unknown'} className={outcomeColor(item.attack_outcome)} /><Metric label="Confidence" value={`${Math.round((item.confidence_score || 0) * 100)}%`} className="text-neon-cyan" /><Metric label="Evidence items" value={evidence.length} className="text-neon-purple" /><Metric label="Response actions" value={responses.length} className="text-neon-green" /></div>
+    <GlassCard hover={false} className="mb-5"><div className="flex items-center gap-2"><Brain className="w-4 h-4 text-neon-blue" /><h2 className="font-semibold text-white">Agent workflow</h2></div><div className="mt-4 overflow-x-auto"><AgentWorkflowDiagram currentAgent={currentAgent} completedAgents={completedAgents} /></div></GlassCard>
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5"><GlassCard hover={false} className="xl:col-span-2"><h2 className="font-semibold text-white">Investigation decisions</h2><div className="mt-5">{decisions.length ? <AgentTimeline decisions={decisions} currentAgent={currentAgent} /> : <p className="text-sm text-slate-500">The agent workflow has not produced decisions yet.</p>}</div></GlassCard><div className="space-y-5"><GlassCard hover={false}><div className="flex gap-2 items-center"><ShieldAlert className="w-4 h-4 text-threat-high" /><h2 className="font-semibold text-white">Assessment</h2></div>{assessments.length ? <Assessment assessment={assessments.at(-1)} /> : <p className="mt-4 text-sm text-slate-500">Awaiting threat assessment.</p>}</GlassCard><GlassCard hover={false}><div className="flex gap-2 items-center"><CheckCircle className="w-4 h-4 text-neon-green" /><h2 className="font-semibold text-white">Verification</h2></div>{verifications.length ? <Verification report={verifications.at(-1)} /> : <p className="mt-4 text-sm text-slate-500">Verification has not completed.</p>}</GlassCard></div></div>
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5"><GlassCard hover={false}><div className="flex justify-between"><h2 className="font-semibold text-white">Evidence</h2><Link to="/evidence" className="text-xs text-neon-blue">Explore all</Link></div><div className="mt-3 space-y-2">{evidence.length ? evidence.slice(0, 5).map((entry) => <div key={entry.id} className="border border-cyber-border/50 rounded-lg p-3"><p className="text-sm text-slate-200">{entry.title}</p><p className="text-xs text-slate-500 mt-1">{entry.evidence_type} · relevance {Math.round((entry.relevance_score || 0) * 100)}%</p></div>) : <p className="text-sm text-slate-500">No persisted evidence yet.</p>}</div></GlassCard><GlassCard hover={false}><div className="flex gap-2 items-center"><Zap className="w-4 h-4 text-neon-purple" /><h2 className="font-semibold text-white">Response actions</h2></div><div className="mt-3 space-y-2">{responses.length ? responses.map((response) => <div key={response.id} className="border border-cyber-border/50 rounded-lg p-3"><div className="flex justify-between gap-2"><p className="capitalize text-sm text-slate-200">{response.action?.replace(/_/g, ' ')}</p><StatusBadge status={response.status} /></div><p className="text-xs text-slate-500 mt-1">{response.target || 'No target specified'}</p></div>) : <p className="text-sm text-slate-500">No response actions recorded.</p>}</div></GlassCard></div>
+  </div>
+}
+
+function Metric({ label, value, className }) { return <GlassCard hover={false} className="p-4"><p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p><p className={`mt-2 text-xl font-semibold capitalize ${className}`}>{value}</p></GlassCard> }
+function Assessment({ assessment }) { return <div className="mt-4 space-y-2 text-sm"><p className={`capitalize font-semibold ${outcomeColor(assessment.attack_outcome)}`}>{assessment.attack_outcome}</p><p className="text-slate-400">{assessment.reasoning || 'No reasoning recorded.'}</p><p className="text-xs text-slate-500">Confidence {Math.round((assessment.confidence_score || 0) * 100)}%</p></div> }
+function Verification({ report }) { return <div className="mt-4 text-sm"><StatusBadge status={report.status} /><div className="mt-3 space-y-1 text-slate-400"><p>Contained: {report.threat_contained ? 'Yes' : 'No'}</p><p>Environment stable: {report.environment_stable ? 'Yes' : 'No'}</p><p>Effectiveness: {Math.round((report.effectiveness_score || 0) * 100)}%</p></div></div> }

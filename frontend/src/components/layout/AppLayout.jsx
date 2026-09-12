@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Sidebar from './Sidebar'
 import TopNav from './TopNav'
@@ -6,6 +6,7 @@ import { useUIStore } from '../../store/uiStore'
 
 export default function AppLayout() {
   const { sidebarCollapsed } = useUIStore()
+  const location = useLocation()
 
   return (
     <div className="flex h-screen overflow-hidden bg-cyber-bg cyber-grid-bg">

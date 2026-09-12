@@ -1,1 +1,18 @@
-import PlaceholderPage from '../PlaceholderPage'; export default () => <PlaceholderPage title="Settings" />
+import { useEffect, useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { Settings, User, Bell, Save } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { api } from '../../api/client'
+import { useAuthStore } from '../../store/authStore'
+import { GlassCard, PageHeader } from '../../components/ui/GlassCard'
+
+export default function SettingsPage() {
+  const { user, updateUser } = useAuthStore()
+  const [fullName, setFullName] = useState(user?.full_name || '')
+  const [notifications, setNotifications] = useState(() => localStorage.getItem('trinetraai-notifications') !== 'off')
+  useEffect(() => { setFullName(user?.full_name || '') }, [user?.full_name])
+  const saveProfile = useMutation({ mutationFn: () => api.updateMe({ full_name: fullName }).then((response) => response.data), onSuccess: (profile) => { updateUser(profile); toast.success('Profile updated') }, onError: (error) => toast.error(error.response?.data?.detail || 'Could not update profile') })
+  const saveNotifications = () => { localStorage.setItem('trinetraai-notifications', notifications ? 'on' : 'off'); toast.success('Notification preference saved') }
+  return <div><PageHeader title="Settings" subtitle="Manage your analyst profile and local workspace preferences" icon={Settings} /><div className="grid grid-cols-1 xl:grid-cols-2 gap-5"><GlassCard hover={false}><div className="flex gap-2 items-center"><User className="w-4 h-4 text-neon-blue" /><h2 className="font-semibold text-white">Profile</h2></div><form onSubmit={(event) => { event.preventDefault(); saveProfile.mutate() }} className="mt-5 space-y-4"><label className="block text-xs text-slate-400">Full name<input value={fullName} onChange={(event) => setFullName(event.target.value)} className="cyber-input mt-1 w-full rounded-lg px-3 py-2" /></label><label className="block text-xs text-slate-400">Email<input value={user?.email || ''} disabled className="cyber-input mt-1 w-full rounded-lg px-3 py-2 opacity-60" /></label><div className="grid grid-cols-2 gap-3"><Field label="Username" value={user?.username} /><Field label="Role" value={user?.role?.replace(/_/g, ' ')} /></div><button disabled={saveProfile.isPending} className="btn-primary rounded-lg px-4 py-2 text-sm font-semibold flex items-center gap-2"><Save className="w-4 h-4" />{saveProfile.isPending ? 'Saving…' : 'Save profile'}</button></form></GlassCard><GlassCard hover={false}><div className="flex gap-2 items-center"><Bell className="w-4 h-4 text-neon-purple" /><h2 className="font-semibold text-white">Workspace preferences</h2></div><div className="mt-5"><label className="flex items-center justify-between rounded-lg border border-cyber-border/50 p-4 cursor-pointer"><div><p className="text-sm text-slate-200">In-app notifications</p><p className="text-xs text-slate-500 mt-1">Show incident and workflow notifications in this browser.</p></div><input type="checkbox" checked={notifications} onChange={(event) => setNotifications(event.target.checked)} className="accent-cyan-500" /></label><button onClick={saveNotifications} className="btn-primary rounded-lg px-4 py-2 text-sm font-semibold mt-4">Save preference</button></div><p className="mt-6 rounded-lg border border-cyber-border/50 bg-cyber-surface/50 p-3 text-xs leading-5 text-slate-500">Profile changes are stored by the API. Notification preferences are intentionally stored only in this browser.</p></GlassCard></div></div>
+}
+function Field({ label, value }) { return <div className="rounded-lg bg-cyber-surface border border-cyber-border/50 p-3"><p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p><p className="mt-1 text-sm capitalize text-slate-300">{value || '—'}</p></div> }

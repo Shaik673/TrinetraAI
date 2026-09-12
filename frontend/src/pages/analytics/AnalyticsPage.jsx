@@ -1,1 +1,15 @@
-import PlaceholderPage from '../PlaceholderPage'; export default () => <PlaceholderPage title="Analytics" />
+import { useQuery } from '@tanstack/react-query'
+import { BarChart3, CheckCircle2, Clock3, ShieldAlert } from 'lucide-react'
+import { api } from '../../api/client'
+import { CyberAreaChart } from '../../components/charts/AreaChart'
+import { SeverityDonut } from '../../components/charts/DonutChart'
+import { GlassCard, LoadingSpinner, PageHeader, StatCard } from '../../components/ui/GlassCard'
+
+export default function AnalyticsPage() {
+  const dashboard = useQuery({ queryKey: ['dashboard'], queryFn: () => api.getDashboardStats().then((response) => response.data) })
+  const severity = useQuery({ queryKey: ['severity-distribution'], queryFn: () => api.getSeverityDistribution().then((response) => response.data) })
+  const trend = useQuery({ queryKey: ['investigation-trend-30'], queryFn: () => api.getInvestigationTrend(30).then((response) => response.data) })
+  if (dashboard.isLoading || severity.isLoading || trend.isLoading) return <div className="h-full flex justify-center items-center"><LoadingSpinner size="lg" /></div>
+  const data = dashboard.data || {}; const performance = data.performance || {}; const investigations = data.investigations || {}
+  return <div><PageHeader title="Analytics" subtitle="Operational outcomes and investigation performance over the last 30 days" icon={BarChart3} /><div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5"><StatCard title="Total alerts" value={data.alerts?.total || 0} icon={ShieldAlert} color="red" /><StatCard title="Completed investigations" value={investigations.completed || 0} icon={CheckCircle2} color="green" /><StatCard title="Success rate" value={`${investigations.success_rate || 0}%`} icon={BarChart3} color="cyan" /><StatCard title="Mean response time" value={`${performance.mttr_minutes || 0}m`} icon={Clock3} color="purple" /></div><div className="grid grid-cols-1 xl:grid-cols-3 gap-5"><GlassCard className="xl:col-span-2" hover={false}><h2 className="font-semibold text-white">30-day investigation trend</h2><p className="mt-1 text-xs text-slate-500">Investigations created by day</p><div className="mt-4"><CyberAreaChart data={trend.data || []} dataKey="count" name="Investigations" height={280} /></div></GlassCard><GlassCard hover={false}><h2 className="font-semibold text-white">Severity distribution</h2><p className="mt-1 text-xs text-slate-500">All recorded alerts</p><SeverityDonut data={severity.data || {}} height={270} /></GlassCard></div><GlassCard hover={false} className="mt-5"><h2 className="font-semibold text-white">Agent activity</h2><div className="mt-4 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3">{Object.entries(data.agent_activity || {}).length ? Object.entries(data.agent_activity).map(([agent, count]) => <div key={agent} className="rounded-lg bg-cyber-surface border border-cyber-border/50 p-3"><p className="text-xs text-slate-500 capitalize">{agent.replace(/_/g, ' ')}</p><p className="mt-2 text-xl font-semibold text-neon-blue">{count}</p></div>) : <p className="text-sm text-slate-500">No agents have completed work yet.</p>}</div></GlassCard></div>
+}

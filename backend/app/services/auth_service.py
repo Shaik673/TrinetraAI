@@ -3,10 +3,12 @@ Authentication service — registration, login, token management.
 """
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.models.user import User
+from app.models.user import UserRole
 from app.core.security import verify_password, get_password_hash, create_access_token, create_refresh_token, decode_token
 from app.schemas.auth import UserCreate
 from app.core.logging import get_logger
@@ -15,9 +17,33 @@ logger = get_logger("auth_service")
 
 
 class AuthService:
+    async def ensure_demo_user(self, db: AsyncSession) -> User:
+        demo_email = "demo@trinetraai.io"
+        user = await self.get_user_by_email(db, demo_email)
+        if user:
+            return user
+
+        user = User(
+            email=demo_email,
+            username="demo_analyst",
+            hashed_password=get_password_hash("Demo@1234"),
+            full_name="Demo Analyst",
+            role=UserRole.ANALYST,
+            is_active=True,
+            is_verified=True,
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        logger.info("demo_user_created", email=user.email)
+        return user
+
+    async def get_user_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
+        result = await db.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
+
     async def create_user(self, db: AsyncSession, user_data: UserCreate) -> User:
-        result = await db.execute(select(User).where(User.email == user_data.email))
-        if result.scalar_one_or_none():
+        if await self.get_user_by_email(db, user_data.email):
             raise ValueError("Email already registered")
 
         result = await db.execute(select(User).where(User.username == user_data.username))
@@ -40,8 +66,7 @@ class AuthService:
         return user
 
     async def authenticate_user(self, db: AsyncSession, email: str, password: str) -> Optional[User]:
-        result = await db.execute(select(User).where(User.email == email))
-        user = result.scalar_one_or_none()
+        user = await self.get_user_by_email(db, email)
         if not user or not verify_password(password, user.hashed_password):
             return None
         if not user.is_active:
@@ -65,8 +90,21 @@ class AuthService:
         user_id = payload.get("sub")
         if not user_id:
             return None
-        result = await db.execute(select(User).where(User.id == user_id))
+        try:
+            user_uuid = UUID(str(user_id))
+        except ValueError:
+            return None
+        result = await db.execute(select(User).where(User.id == user_uuid))
         return result.scalar_one_or_none()
+
+    async def update_user(self, db: AsyncSession, user: User, **fields) -> User:
+        """Update only profile fields that are safe for a user to change."""
+        for name, value in fields.items():
+            if value is not None:
+                setattr(user, name, value)
+        await db.commit()
+        await db.refresh(user)
+        return user
 
 
 auth_service = AuthService()

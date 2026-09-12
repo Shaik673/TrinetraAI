@@ -1,0 +1,13 @@
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.env
+backend/logs/*
+backend/trinetraai.db
+backend/chroma_data/
+frontend/node_modules/
+frontend/dist/
+*.pyc
+*.log
+.DS_Store

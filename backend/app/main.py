@@ -11,8 +11,9 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.logging import setup_logging, get_logger
-from app.db.base import init_db
+from app.db.base import init_db, AsyncSessionLocal
 from app.api import api_router
+from app.services.auth_service import auth_service
 
 # Ensure logs directory exists
 os.makedirs("./logs", exist_ok=True)
@@ -25,6 +26,8 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown."""
     logger.info("trinetraai_starting", version=settings.APP_VERSION)
     await init_db()
+    async with AsyncSessionLocal() as db:
+        await auth_service.ensure_demo_user(db)
     logger.info("database_initialized")
     yield
     logger.info("trinetraai_shutting_down")

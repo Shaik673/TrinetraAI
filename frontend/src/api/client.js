@@ -33,6 +33,9 @@ export const api = {
   // Auth
   login: (data) => apiClient.post('/auth/login', data),
   register: (data) => apiClient.post('/auth/register', data),
+  getMe: () => apiClient.get('/auth/me'),
+  updateMe: (data) => apiClient.put('/auth/me', data),
+  requestPasswordReset: (data) => apiClient.post('/auth/request-password-reset', data),
 
   // Alerts
   getAlerts: (params) => apiClient.get('/alerts', { params }),

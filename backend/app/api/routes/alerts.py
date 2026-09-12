@@ -68,6 +68,17 @@ async def get_alert_stats(db: AsyncSession = Depends(get_db)):
     return await alert_service.get_alert_stats(db)
 
 
+@router.post("/demo/seed")
+async def seed_demo_alerts(db: AsyncSession = Depends(get_db)):
+    """Seed the database with realistic demo alerts.
+
+    This static route must be registered before ``/{alert_id}``; otherwise the
+    dynamic route captures ``demo`` and Starlette returns a 405 for POST.
+    """
+    alerts = await alert_service.seed_demo_alerts(db)
+    return {"created": len(alerts), "message": f"Created {len(alerts)} demo alerts"}
+
+
 @router.get("/{alert_id}")
 async def get_alert(alert_id: str, db: AsyncSession = Depends(get_db)):
     alert = await alert_service.get_alert(db, alert_id)
@@ -126,10 +137,3 @@ async def trigger_investigation(
         "status": "investigation_started",
         "message": "Autonomous investigation launched",
     }
-
-
-@router.post("/demo/seed")
-async def seed_demo_alerts(db: AsyncSession = Depends(get_db)):
-    """Seed the database with realistic demo alerts."""
-    alerts = await alert_service.seed_demo_alerts(db)
-    return {"created": len(alerts), "message": f"Created {len(alerts)} demo alerts"}

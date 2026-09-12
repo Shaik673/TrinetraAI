@@ -1,2 +1,10 @@
-import PlaceholderPage from '../PlaceholderPage'
-export default () => <PlaceholderPage title="Password recovery" />
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { CheckCircle2, Mail, Shield } from 'lucide-react'
+import { api } from '../../api/client'
+
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState(''); const [sent, setSent] = useState(false); const [loading, setLoading] = useState(false); const [error, setError] = useState('')
+  const submit = async (event) => { event.preventDefault(); setLoading(true); setError(''); try { await api.requestPasswordReset({ email }); setSent(true) } catch { setError('Could not submit your request. Check the API connection and try again.') } finally { setLoading(false) } }
+  return <main className="min-h-screen bg-hero-gradient cyber-grid-bg flex items-center justify-center p-4"><div className="glass-strong border border-cyber-border rounded-2xl p-7 w-full max-w-md"><Shield className="w-10 h-10 p-2 rounded-xl bg-neon-blue/10 text-neon-blue" /><h1 className="mt-4 text-xl font-bold text-white">Password recovery</h1>{sent ? <div className="mt-4"><CheckCircle2 className="w-8 h-8 text-neon-green" /><p className="mt-3 text-sm text-slate-300">If an account matches <strong>{email}</strong>, reset instructions will be sent.</p><p className="mt-3 rounded-lg bg-cyber-surface p-3 text-xs leading-5 text-slate-500">This local project does not configure an email delivery provider yet. Ask your SOC administrator to reset the account until one is connected.</p></div> : <><p className="mt-2 text-sm text-slate-500">Enter your email and we’ll register a password-reset request.</p>{error && <p className="mt-4 text-sm text-threat-critical">{error}</p>}<form onSubmit={submit} className="mt-5"><label className="text-xs uppercase tracking-wider text-slate-400">Email<span className="relative mt-1 block"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" /><input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="cyber-input w-full rounded-lg py-2.5 pl-9 pr-3 text-sm normal-case" /></span></label><button disabled={loading} className="btn-primary w-full rounded-lg py-2.5 mt-4 text-sm font-semibold">{loading ? 'Submitting…' : 'Request reset'}</button></form></>}<Link to="/login" className="mt-6 inline-block text-sm text-neon-blue">Back to sign in</Link></div></main>
+}
