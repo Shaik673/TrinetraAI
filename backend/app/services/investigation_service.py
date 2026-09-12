@@ -15,7 +15,6 @@ from app.models.investigation import (
 )
 from app.models.alert import Alert, AlertStatus
 from app.workflow.state import create_initial_state, InvestigationState
-from app.workflow.graph import investigation_graph
 from app.core.logging import get_logger
 
 logger = get_logger("investigation_service")
@@ -89,6 +88,9 @@ class InvestigationService:
 
         try:
             # Run the LangGraph workflow
+            # Import lazily: dashboard and alert APIs do not require optional
+            # AI-workflow dependencies to be initialized at server startup.
+            from app.workflow.graph import investigation_graph
             logger.info("investigation_workflow_started", investigation_id=investigation_id)
             final_state = await investigation_graph.ainvoke(initial_state)
 

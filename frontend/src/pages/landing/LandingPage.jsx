@@ -1,0 +1,2 @@
+import { Link } from 'react-router-dom'
+export default function LandingPage() { return <main className="min-h-screen bg-cyber-bg flex items-center justify-center text-center text-slate-100 p-6"><div><h1 className="text-4xl font-bold gradient-text">TrinetraAI</h1><p className="text-slate-400 mt-3">Autonomous security operations platform</p><Link to="/login" className="inline-block btn-primary rounded-lg px-5 py-3 mt-7">Open platform</Link></div></main> }

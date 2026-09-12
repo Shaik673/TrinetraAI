@@ -1,0 +1,3 @@
+import { useEffect, useState } from 'react'
+import { api } from '../../api/client'
+export default function DashboardPage() { const [stats, setStats] = useState(null); const [error, setError] = useState(''); const load = () => api.getDashboardStats().then(r => setStats(r.data)).catch(() => setError('Backend unavailable')); useEffect(load, []); return <section><h1 className="text-2xl font-bold text-white">Dashboard</h1>{error ? <p className="text-threat-critical mt-4">{error}</p> : <pre className="glass mt-5 p-5 rounded-xl text-neon-cyan overflow-auto">{JSON.stringify(stats, null, 2)}</pre>}</section> }

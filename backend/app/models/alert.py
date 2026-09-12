@@ -3,9 +3,8 @@ Security Alert model.
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, Enum as SAEnum, Float, JSON, ForeignKey
+from sqlalchemy import String, Text, DateTime, Enum as SAEnum, Float, JSON, ForeignKey, Uuid as UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.base import Base

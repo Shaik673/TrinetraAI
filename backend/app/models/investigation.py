@@ -3,9 +3,8 @@ Investigation, Evidence, ThreatAssessment, Response, Verification, Reflection mo
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, Enum as SAEnum, Float, JSON, ForeignKey, Integer, Boolean
+from sqlalchemy import String, Text, DateTime, Enum as SAEnum, Float, JSON, ForeignKey, Integer, Boolean, Uuid as UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.base import Base
@@ -283,7 +282,7 @@ class Asset(Base):
     open_ports: Mapped[list] = mapped_column(JSON, default=list)
     services: Mapped[list] = mapped_column(JSON, default=list)
     tags: Mapped[list] = mapped_column(JSON, default=list)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    asset_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(

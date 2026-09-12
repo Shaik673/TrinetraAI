@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/trinetraai"
+    # SQLite makes local development self-contained. Override in .env for PostgreSQL.
+    DATABASE_URL: str = "sqlite+aiosqlite:///./trinetraai.db"
     SYNC_DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/trinetraai"
 
     # Redis

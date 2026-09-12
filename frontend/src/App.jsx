@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import AppLayout from './components/layout/AppLayout'
 import LandingPage from './pages/landing/LandingPage'
@@ -21,44 +20,34 @@ import AnalyticsPage from './pages/analytics/AnalyticsPage'
 import SettingsPage from './pages/settings/SettingsPage'
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuthStore()
-  return isAuthenticated ? children : <Navigate to="/login" replace />
+  return useAuthStore((state) => state.isAuthenticated) ? children : <Navigate to="/login" replace />
 }
 
 function PublicRoute({ children }) {
-  const { isAuthenticated } = useAuthStore()
-  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />
+  return useAuthStore((state) => state.isAuthenticated) ? <Navigate to="/dashboard" replace /> : children
 }
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <AnimatePresence mode="wait">
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
-          <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-
-          {/* Protected app routes */}
-          <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="investigations" element={<InvestigationsPage />} />
-            <Route path="investigations/:id" element={<InvestigationDetailPage />} />
-            <Route path="alerts" element={<AlertsPage />} />
-            <Route path="alerts/:id" element={<AlertDetailPage />} />
-            <Route path="evidence" element={<EvidenceExplorerPage />} />
-            <Route path="threat-intel" element={<ThreatIntelPage />} />
-            <Route path="agents" element={<AgentOperationsPage />} />
-            <Route path="response" element={<ResponseCenterPage />} />
-            <Route path="verification" element={<VerificationCenterPage />} />
-            <Route path="timeline" element={<IncidentTimelinePage />} />
-            <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-        </Routes>
-      </AnimatePresence>
-    </BrowserRouter>
-  )
+  return <BrowserRouter><Routes>
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+    <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+    <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/investigations" element={<InvestigationsPage />} />
+      <Route path="/investigations/:id" element={<InvestigationDetailPage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
+      <Route path="/alerts/:id" element={<AlertDetailPage />} />
+      <Route path="/evidence" element={<EvidenceExplorerPage />} />
+      <Route path="/threat-intel" element={<ThreatIntelPage />} />
+      <Route path="/agents" element={<AgentOperationsPage />} />
+      <Route path="/response" element={<ResponseCenterPage />} />
+      <Route path="/verification" element={<VerificationCenterPage />} />
+      <Route path="/timeline" element={<IncidentTimelinePage />} />
+      <Route path="/analytics" element={<AnalyticsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Route>
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></BrowserRouter>
 }

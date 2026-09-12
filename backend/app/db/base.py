@@ -21,13 +21,11 @@ class Base(DeclarativeBase):
     metadata = metadata
 
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-)
+engine_options = {"echo": settings.DEBUG}
+if not settings.DATABASE_URL.startswith("sqlite"):
+    engine_options.update(pool_pre_ping=True, pool_size=10, max_overflow=20)
+
+engine = create_async_engine(settings.DATABASE_URL, **engine_options)
 
 AsyncSessionLocal = async_sessionmaker(
     engine,
@@ -49,5 +47,7 @@ async def get_db() -> AsyncSession:
 
 
 async def init_db():
+    # Register every model before generating the schema.
+    import app.models  # noqa: F401
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

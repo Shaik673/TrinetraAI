@@ -3,9 +3,8 @@ User model with role-based access control.
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Boolean, DateTime, Enum as SAEnum
+from sqlalchemy import String, Boolean, DateTime, Enum as SAEnum, Uuid as UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 from app.db.base import Base
