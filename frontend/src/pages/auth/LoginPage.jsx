@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
-import { api } from '../../api/client'
+import { api, getApiErrorMessage } from '../../api/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
@@ -24,7 +24,7 @@ export default function LoginPage() {
       toast.success('Welcome to TrinetraAI')
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Authentication failed')
+      setError(getApiErrorMessage(err, 'Authentication failed'))
     } finally {
       setLoading(false)
     }

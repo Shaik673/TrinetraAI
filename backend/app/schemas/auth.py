@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from uuid import UUID
 from app.models.user import UserRole
@@ -6,15 +6,14 @@ from app.models.user import UserRole
 
 class UserCreate(BaseModel):
     email: EmailStr
-    username: str
-    password: str
-    full_name: Optional[str] = None
-    role: UserRole = UserRole.ANALYST
+    username: str = Field(min_length=3, max_length=100, pattern=r"^[a-zA-Z0-9_.-]+$")
+    password: str = Field(min_length=8, max_length=128)
+    full_name: Optional[str] = Field(default=None, max_length=200)
 
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=128)
 
 
 class UserResponse(BaseModel):

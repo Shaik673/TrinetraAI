@@ -16,3 +16,9 @@ Traceback (most recent call last):
     version = _bcrypt.__about__.__version__
               ^^^^^^^^^^^^^^^^^
 AttributeError: module 'bcrypt' has no attribute '__about__'
+2026-09-13 16:40:41,216 INFO httpx HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+2026-09-13 16:40:41,581 INFO httpx HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 201 Created"
+2026-09-13 16:40:41,932 INFO httpx HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-09-13 17:01:46,160 INFO httpx HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 201 Created"
+2026-09-13 17:01:46,536 INFO httpx HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+2026-09-13 17:01:46,540 INFO httpx HTTP Request: POST http://testserver/api/v1/auth/register "HTTP/1.1 422 Unprocessable Entity"

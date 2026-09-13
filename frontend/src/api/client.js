@@ -9,6 +9,14 @@ export const apiClient = axios.create({
   timeout: 30000,
 })
 
+export function getApiErrorMessage(error, fallback = 'Something went wrong') {
+  const detail = error.response?.data?.detail
+  if (Array.isArray(detail)) return detail.map((item) => item.msg).join(', ')
+  if (typeof detail === 'string') return detail
+  if (error.code === 'ERR_NETWORK') return 'Unable to reach the backend. Make sure it is running on port 8000.'
+  return fallback
+}
+
 // Attach auth token
 apiClient.interceptors.request.use((config) => {
   const token = useAuthStore.getState().getToken()

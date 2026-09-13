@@ -39,7 +39,7 @@ class AuthService:
         return user
 
     async def get_user_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
-        result = await db.execute(select(User).where(User.email == email))
+        result = await db.execute(select(User).where(User.email == email.strip().lower()))
         return result.scalar_one_or_none()
 
     async def create_user(self, db: AsyncSession, user_data: UserCreate) -> User:
@@ -51,11 +51,11 @@ class AuthService:
             raise ValueError("Username already taken")
 
         user = User(
-            email=user_data.email,
-            username=user_data.username,
+            email=str(user_data.email).strip().lower(),
+            username=user_data.username.strip(),
             hashed_password=get_password_hash(user_data.password),
             full_name=user_data.full_name,
-            role=user_data.role,
+            role=UserRole.ANALYST,
             is_active=True,
             is_verified=True,  # Auto-verify in dev
         )
