@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
+const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -44,6 +45,11 @@ export const api = {
   getMe: () => apiClient.get('/auth/me'),
   updateMe: (data) => apiClient.put('/auth/me', data),
   requestPasswordReset: (data) => apiClient.post('/auth/request-password-reset', data),
+
+  // Social OAuth — redirects browser to provider login page
+  initiateOAuth: (provider) => {
+    window.location.href = `${BACKEND_BASE}/api/v1/auth/oauth/${provider}`
+  },
 
   // Alerts
   getAlerts: (params) => apiClient.get('/alerts', { params }),

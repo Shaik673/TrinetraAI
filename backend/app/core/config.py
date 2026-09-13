@@ -53,9 +53,25 @@ class Settings(BaseSettings):
     INVESTIGATION_CONFIDENCE_THRESHOLD: float = 0.75
     MAX_INVESTIGATION_CYCLES: int = 5
 
+    # Frontend URL (used for OAuth redirects)
+    FRONTEND_URL: str = "http://localhost:5173"
+
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
+    # GitHub OAuth
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+
+    # Facebook OAuth
+    FACEBOOK_CLIENT_ID: str = ""
+    FACEBOOK_CLIENT_SECRET: str = ""
+
     class Config:
         env_file = ".env"
         case_sensitive = True
 
 
 settings = Settings()
+

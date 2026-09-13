@@ -5,6 +5,8 @@ import LandingPage from './pages/landing/LandingPage'
 import LoginPage from './pages/auth/LoginPage'
 import SignupPage from './pages/auth/SignupPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import OAuthCallbackPage from './pages/auth/OAuthCallbackPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import InvestigationsPage from './pages/investigations/InvestigationsPage'
 import InvestigationDetailPage from './pages/investigations/InvestigationDetailPage'
@@ -28,26 +30,41 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
-  return <BrowserRouter><Routes>
-    <Route path="/" element={<LandingPage />} />
-    <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-    <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
-    <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-    <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/investigations" element={<InvestigationsPage />} />
-      <Route path="/investigations/:id" element={<InvestigationDetailPage />} />
-      <Route path="/alerts" element={<AlertsPage />} />
-      <Route path="/alerts/:id" element={<AlertDetailPage />} />
-      <Route path="/evidence" element={<EvidenceExplorerPage />} />
-      <Route path="/threat-intel" element={<ThreatIntelPage />} />
-      <Route path="/agents" element={<AgentOperationsPage />} />
-      <Route path="/response" element={<ResponseCenterPage />} />
-      <Route path="/verification" element={<VerificationCenterPage />} />
-      <Route path="/timeline" element={<IncidentTimelinePage />} />
-      <Route path="/analytics" element={<AnalyticsPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-    </Route>
-    <Route path="*" element={<Navigate to="/" replace />} />
-  </Routes></BrowserRouter>
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public marketing page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Auth pages — redirect to dashboard if already logged in */}
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+        <Route path="/reset-password" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+
+        {/* OAuth callback — must be accessible without auth (tokens arrive here) */}
+        <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+
+        {/* Protected app routes — wrapped in the sidebar layout */}
+        <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/investigations" element={<InvestigationsPage />} />
+          <Route path="/investigations/:id" element={<InvestigationDetailPage />} />
+          <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/alerts/:id" element={<AlertDetailPage />} />
+          <Route path="/evidence" element={<EvidenceExplorerPage />} />
+          <Route path="/threat-intel" element={<ThreatIntelPage />} />
+          <Route path="/agents" element={<AgentOperationsPage />} />
+          <Route path="/response" element={<ResponseCenterPage />} />
+          <Route path="/verification" element={<VerificationCenterPage />} />
+          <Route path="/timeline" element={<IncidentTimelinePage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
